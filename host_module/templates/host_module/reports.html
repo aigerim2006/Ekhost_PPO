@@ -1,0 +1,120 @@
+{% extends "host_module/base.html" %}
+
+{% block title %}Финансовые отчеты - Эквайринг-хост{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h2>📊 Сводные отчеты и проводки</h2>
+    <p class="text-muted">Конвертация в сомовый эквивалент (KGS) по курсу НБКР.</p>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-white font-weight-bold">Сформированные проводки</div>
+    <div class="table-responsive">
+        <table class="table table-sm table-striped mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID Проводки</th>
+                    <th>Счет (Merchant ID)</th>
+                    <th>Дата формирования</th>
+                    <th>Сумма (KGS Эквивалент)</th>
+                    <th>Статус АБС</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for post in postings %}
+                <tr>
+                    <td>{{ post.id }}</td>
+                    <td>ID: {{ post.merchant_id }} ({{ post.account_number }})</td>
+                    <td>{{ post.post_date|date:"d.m.Y H:i" }}</td>
+                    <td class="fw-bold text-primary">{{ post.amount_kgs }}</td>
+                    <td>
+                        {# Проверяем статус в любом регистре, который может прийти из базы #}
+                        {% if post.status == 'Success' or post.status == 'SUCCESS' or post.status == 'success' %}
+                            <span class="text-success">● Выполнено</span>
+                        {% else %}
+                            <span class="text-danger" title="{{ post.status }}">● Ошибка</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center py-4 text-muted">Проводки еще не сформированы. Нажмите "Сформировать проводки" в логах.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div> 
+
+<div class="alert alert-info">
+    <strong>Примечание для аудита:</strong> Согласно п. 4.3 ТЗ, все действия по формированию проводок логируются в системе.
+</div>
+<hr class="my-5">
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-primary mb-4">
+            <div class="card-header bg-primary text-white fw-bold">💰 Сумма по Мерчантам (за день)</div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Merchant ID</th>
+                            <th>Оборот (KGS)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in merchant_report %}
+                        <tr>
+                            <td><strong>ID: {{ item.merchant_id }}</strong></td>
+                            <td>{{ item.total_amount|floatformat:2 }} сом</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="2" class="text-center text-muted p-3">Нет данных по мерчантам</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card shadow-sm border-info mb-4">
+            <div class="card-header bg-info text-white fw-bold">📱 Оборот по расчетным счетам</div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Номер счета</th>
+                            <th>Кол-во операций</th>
+                            <th>Сумма (KGS)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in device_report %}
+                        <tr>
+                            {# Выводим device_code, в который мы во views.py упаковали account_number #}
+                            <td class="text-monospace">{{ item.device_code }}</td>
+                            <td>{{ item.total_ops }} шт.</td>
+                            <td>{{ item.total_sum|floatformat:2 }} сом</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center text-muted p-3">Нет данных по счетам</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-secondary mt-3 d-flex justify-content-between align-items-center p-4 shadow-sm">
+    <h4 class="mb-0 fw-bold text-secondary">ОБЩИЙ ОБЪЕМ СПИСАНИЙ (В СОМАХ):</h4>
+    <h3 class="mb-0 text-success fw-bold">{{ total_day_sum|floatformat:2 }} KGS</h3>
+</div>
+{% endblock %}
