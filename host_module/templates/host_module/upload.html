@@ -9,11 +9,32 @@
             <h3 class="text-center mb-4">📥 Импорт данных МПЦ</h3>
             <p class="text-muted small text-center">Поддерживаемые форматы: .xlsx, .csv. Система автоматически проверит дубликаты и валидность терминалов.</p>
             
+            {% if error %}
+                <div class="alert alert-danger shadow-sm border-2 mb-3" role="alert">
+                    <strong>❌ Ошибка импорта:</strong> {{ error }}
+                </div>
+            {% endif %}{% extends "host_module/base.html" %}
+
+{% block title %}Загрузка отчета - Эквайринг-хост{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card p-4 shadow-sm">
+            <h3 class="text-center mb-4">📥 Импорт данных МПЦ</h3>
+            <p class="text-muted small text-center">Поддерживаемые форматы: .xlsx, .csv. Система автоматически проверит дубликаты и валидность терминалов.</p>
+            
+            {% if error %}
+                <div class="alert alert-danger shadow-sm border-2 mb-3" role="alert">
+                    <strong>❌ Ошибка импорта:</strong> {{ error }}
+                </div>
+            {% endif %}
+            
             <form action="{% url 'upload' %}" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="mb-3">
                     <label for="formFile" class="form-label font-weight-bold">Выберите файл отчета за предыдущий день</label>
-                    <input class="form-control" type="file" id="formFile" name="file" required>
+                    <input class="form-control" type="file" id="formFile" name="excel_file" required>
                 </div>
                 <div class="d-grid">
                     <button type="submit" class="btn btn-primary btn-lg">Загрузить и обработать</button>
@@ -23,7 +44,31 @@
         
         <div class="mt-4 p-3 bg-warning bg-opacity-10 border border-warning rounded">
             <h6 class="text-warning fw-bold">⚠️ Напоминание для оператора (ТЗ п. 4.1):</h6>
-            <ul class="small mb-0 PS-3">
+            <ul class="small mb-0 ps-3">
+                <li>ID транзакций проверяются на уникальность в базе данных.</li>
+                <li>DeviceCode (код устройства) должен быть заранее зарегистрирован в справочнике банка.</li>
+                <li>Номера карт клиентов маскируются автоматически ради безопасности (PCI DSS).</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %} 
+            
+            <form action="{% url 'upload' %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="formFile" class="form-label font-weight-bold">Выберите файл отчета за предыдущий день</label>
+                    <input class="form-control" type="file" id="formFile" name="excel_file" required>
+                </div>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary btn-lg">Загрузить и обработать</button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="mt-4 p-3 bg-warning bg-opacity-10 border border-warning rounded">
+            <h6 class="text-warning fw-bold">⚠️ Напоминание для оператора (ТЗ п. 4.1):</h6>
+            <ul class="small mb-0 ps-3">
                 <li>ID транзакций проверяются на уникальность в базе данных.</li>
                 <li>DeviceCode (код устройства) должен быть заранее зарегистрирован в справочнике банка.</li>
                 <li>Номера карт клиентов маскируются автоматически ради безопасности (PCI DSS).</li>

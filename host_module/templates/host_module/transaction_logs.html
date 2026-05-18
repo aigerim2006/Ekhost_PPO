@@ -8,9 +8,13 @@
         <h2>📜 Реестр загруженных транзакций</h2>
         <p class="text-muted mb-0">Первичный буфер транзакций, поступивших из Межбанковского процессингового центра.</p>
     </div>
-    <a href="{% url 'reports' %}?generate=true" class="btn btn-warning btn-lg shadow-sm fw-bold">
-        ⚙️ Сформировать проводки (АБС)
-    </a>
+    
+    <form method="POST" action="{% url 'transaction_logs' %}">
+        {% csrf_token %}
+        <button type="submit" name="create_postings" class="btn btn-warning btn-lg shadow-sm fw-bold">
+            ⚙️ Сформировать проводки (АБС)
+        </button>
+    </form>
 </div>
 
 <div class="card shadow-sm">

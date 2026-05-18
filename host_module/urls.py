@@ -2,16 +2,12 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    # Страница загрузки (главная)
+    # Главная страница загрузки файлов
     path('', views.upload_page, name='upload'),
     
-    # Лог транзакций
-    path('logs/', views.logs_page, name='logs'),
+    # Страница со списком транзакций (заменили logs_page на transaction_logs)
+    path('logs/', views.transaction_logs, name='transaction_logs'),
     
-    # Финансовые отчеты и проводки
-    path('reports/', views.reports_page, name='reports'),
-    
-    # API эндпоинты (для rest_framework)
-    path('api/transactions/', views.transaction_list_api, name='api_transactions'),
-    path('api/postings/', views.posting_list_api, name='api_postings'),
+    # Страница сводных финансовых отчетов (убедись, что имя совпадает)
+    path('reports/', views.financial_reports_view, name='financial_reports'),
 ]

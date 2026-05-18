@@ -51,14 +51,17 @@
                         <a class="nav-link px-3 {% if request.resolver_match.url_name == 'upload' %}active{% endif %}" 
                            href="{% url 'upload' %}">Загрузка файла</a>
                     </li>
+                    
                     <li class="nav-item">
-                        <a class="nav-link px-3 {% if request.resolver_match.url_name == 'logs' %}active{% endif %}" 
-                           href="{% url 'logs' %}">Лог транзакций</a>
+                        <a class="nav-link px-3 {% if request.resolver_match.url_name == 'transaction_logs' %}active{% endif %}" 
+                           href="{% url 'transaction_logs' %}">Лог транзакций</a>
                     </li>
+                    
                     <li class="nav-item">
-                        <a class="nav-link px-3 {% if request.resolver_match.url_name == 'reports' %}active{% endif %}" 
-                           href="{% url 'reports' %}">Финансовые отчеты</a>
+                        <a class="nav-link px-3 {% if request.resolver_match.url_name == 'financial_reports' %}active{% endif %}" 
+                           href="{% url 'financial_reports' %}">Финансовые отчеты</a>
                     </li>
+                    
                     <li class="nav-item ms-lg-3">
                         <a class="btn btn-outline-light btn-sm mt-1" href="/admin/">Админ-панель (Аудит)</a>
                     </li>
