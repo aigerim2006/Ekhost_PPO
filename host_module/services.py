@@ -65,25 +65,21 @@ def process_excel_file(file_path):
 
 def create_postings():
     """Бизнес-логика: Агрегация и формирование проводок"""
-    transactions = TransactionLoad.objects.filter(status="Processed")
+    # Исправлено: берем и Processed, и Failed транзакции для возможности исправления ошибок
+    transactions = TransactionLoad.objects.filter(status__in=["Processed", "Failed"])
     
     for tx in transactions:
         term = None
         try:
-            # 1. Поиск терминала
             term = Terminal.objects.get(device_code=tx.device_code)
-            
-            # 2. Поиск счета (merchant_id теперь Integer)
             account = MerchantAccount.objects.get(
                 merchant_id=term.merchant_id, 
                 currency=tx.currency
             )
             
-            # 3. Конвертация
             rate = get_nbkr_rate(tx.currency)
             amount_kgs = tx.amount * rate
             
-            # 4. Создание проводки
             PostingLog.objects.create(
                 merchant_id=term.merchant_id,         
                 account_number=account.account_number,
@@ -101,15 +97,16 @@ def create_postings():
             tx.save()
             
         except MerchantAccount.DoesNotExist:
-            # Если счета нет, фиксируем это в логе проводок
             m_id = term.merchant_id if term else 0
-            PostingLog.objects.create(
-                merchant_id=m_id,
-                account_number="MISSING",
-                amount_original=tx.amount,
-                currency=tx.currency,
-                amount_kgs=0,
-                status=f"Error: No {tx.currency} account"
-            )
+            # Чтобы не плодить дубликаты записей MISSING при повторных нажатиях:
+            if tx.status != "Failed":
+                PostingLog.objects.create(
+                    merchant_id=m_id,
+                    account_number="MISSING",
+                    amount_original=tx.amount,
+                    currency=tx.currency,
+                    amount_kgs=0,
+                    status=f"Error: No {tx.currency} account"
+                )
             tx.status = "Failed"
             tx.save()

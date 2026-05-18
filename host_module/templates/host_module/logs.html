@@ -4,8 +4,11 @@
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>📜 Реестр загруженных транзакций</h2>
-    <a href="{% url 'reports' %}?generate=true" class="btn btn-warning shadow-sm">
+    <div>
+        <h2>📜 Реестр загруженных транзакций</h2>
+        <p class="text-muted mb-0">Первичный буфер транзакций, поступивших из Межбанковского процессингового центра.</p>
+    </div>
+    <a href="{% url 'reports' %}?generate=true" class="btn btn-warning btn-lg shadow-sm fw-bold">
         ⚙️ Сформировать проводки (АБС)
     </a>
 </div>
@@ -13,37 +16,41 @@
 <div class="card shadow-sm">
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">
-            <thead class="table-light">
+            <thead class="table-dark">
                 <tr>
                     <th>Ext_ID</th>
-                    <th>Устройство</th>
+                    <th>Устройство (Terminal)</th>
                     <th>Дата операции</th>
                     <th>Сумма</th>
                     <th>Валюта</th>
                     <th>Номер карты</th>
-                    <th>Статус</th>
+                    <th>Статус системы</th>
                 </tr>
             </thead>
             <tbody>
                 {% for tx in transactions %}
                 <tr>
                     <td><small class="text-muted">{{ tx.external_id }}</small></td>
-                    <td><strong>{{ tx.device_code }}</strong></td>
+                    <td><span class="badge bg-light text-dark border">{{ tx.device_code }}</span></td>
                     <td>{{ tx.oper_date|date:"d.m.Y H:i" }}</td>
-                    <td>{{ tx.amount }}</td>
+                    <td class="fw-bold">{{ tx.amount }}</td>
                     <td><span class="badge bg-secondary">{{ tx.currency }}</span></td>
                     <td><code>{{ tx.card_number }}</code></td>
                     <td>
-                        {% if tx.status == 'Processed' %}
-                            <span class="badge bg-success">Обработано</span>
+                        {% if tx.status == 'Completed' %}
+                            <span class="badge bg-success">● Проведено в АБС</span>
+                        {% elif tx.status == 'Processed' %}
+                            <span class="badge bg-info text-dark">● Готов к проводке</span>
+                        {% elif tx.status == 'Failed' %}
+                            <span class="badge bg-warning text-dark" title="Отсутствует счет мерчанта для этой валюты">● Ошибка: Нет счета</span>
                         {% else %}
-                            <span class="badge bg-danger" title="{{ tx.status }}">{{ tx.status }}</span>
+                            <span class="badge bg-danger" title="{{ tx.status }}">● {{ tx.status }}</span>
                         {% endif %}
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="7" class="text-center py-4 text-muted">Транзакции пока не загружены.</td>
+                    <td colspan="7" class="text-center py-4 text-muted">Транзакции пока не загружены в систему.</td>
                 </tr>
                 {% endfor %}
             </tbody>
