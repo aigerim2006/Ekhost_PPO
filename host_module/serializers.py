@@ -1,11 +1,12 @@
 from rest_framework import serializers
-from .models import TransactionLoad, PostingLog
+from .models import TransactionsLoad, PostingsLog
+
 class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = TransactionLoad
-        # Указываем, какие поля мы хотим отдавать по API
+        model = TransactionsLoad
         fields = ['external_id', 'device_code', 'oper_date', 'amount', 'currency', 'card_number', 'status']
+
 class PostingSerializer(serializers.ModelSerializer):
     class Meta:
-        model = PostingLog
+        model = PostingsLog
         fields = '__all__'

@@ -1,5 +1,4 @@
 from django.contrib import admin
-# Импортируем измененные по ТЗ названия классов (с буквой s)
 from .models import Terminal, MerchantAccount, ExchangeRate, TransactionsLoad, PostingsLog
 
 @admin.register(Terminal)

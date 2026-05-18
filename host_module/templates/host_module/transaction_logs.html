@@ -9,12 +9,24 @@
         <p class="text-muted mb-0">Первичный буфер транзакций, поступивших из Межбанковского процессингового центра.</p>
     </div>
     
-    <form method="POST" action="{% url 'transaction_logs' %}">
-        {% csrf_token %}
-        <button type="submit" name="create_postings" class="btn btn-warning btn-lg shadow-sm fw-bold">
-            ⚙️ Сформировать проводки (АБС)
-        </button>
-    </form>
+    <div class="d-flex gap-3 align-items-center">
+        
+        <form method="GET" action="{% url 'transaction_logs' %}" class="d-flex gap-2 align-items-center border p-2 rounded bg-light shadow-sm">
+            <label for="filter_date" class="fw-bold text-nowrap mb-0">📅 Фильтр по дате:</label>
+            <input type="date" id="filter_date" name="filter_date" class="form-control" value="{{ v_date }}">
+            <button type="submit" class="btn btn-primary btn-sm fw-bold">Найти</button>
+            {% if v_date %}
+                <a href="{% url 'transaction_logs' %}" class="btn btn-outline-secondary btn-sm">Сбросить</a>
+            {% endif %}
+        </form>
+
+        <form method="POST" action="{% url 'transaction_logs' %}">
+            {% csrf_token %}
+            <button type="submit" name="create_postings" class="btn btn-warning btn-lg shadow-sm fw-bold">
+                ⚙️ Сформировать проводки (АБС)
+            </button>
+        </form>
+    </div>
 </div>
 
 <div class="card shadow-sm">
@@ -54,7 +66,7 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="7" class="text-center py-4 text-muted">Транзакции пока не загружены в систему.</td>
+                    <td colspan="7" class="text-center py-4 text-muted">Транзакции за выбранный период не найдены или ещё не загружены.</td>
                 </tr>
                 {% endfor %}
             </tbody>
